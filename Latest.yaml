@@ -1,0 +1,156 @@
+﻿port: 7890
+socks-port: 7891
+allow-lan: true
+mode: rule
+log-level: info
+external-controller: 127.0.0.1:9090
+proxies:
+  - name: "ss sshocean"
+    type: ss
+    server: id02-ss.sshocean.net
+    port: 1443
+    cipher: chacha20-ietf-poly1305
+    password: OTYyZ
+    plugin: obfs
+    plugin-opts:
+      mode: tls
+      host: m.youtube.com
+  - name: Ket YT
+    type: trojan
+    server: sg6-trojan.bonds.id
+    port: 443
+    password: 7a80c340-f911-11eb-a7cb-1239d0255272
+    udp: true
+    sni: m.youtube.com
+    alpn:
+       - h2
+       - http/1.1
+    skip-cert-verify: true
+  - name: "Jagoanssh"
+    type: ss
+    server: sg1socks.ipservers.xyz
+    port: 1443
+    cipher: aes-256-cfb
+    password: ELwVZunWjh
+    plugin: obfs
+    plugin-opts:
+      mode: tls
+      host: m.youtube.com
+  - name: "sshstores 1"
+    type: vmess
+    server: v2raysg-5.sshstores.vip
+    port: 443
+    uuid: 4960336d-8fd0-490b-8bb4-1b3063eae91c
+    alterId: 64
+    cipher: auto
+    tls: true
+    skip-cert-verify: true
+    servername: null
+    network: ws
+    ws-path: /sshstores
+    ws-headers:
+      Host: m.youtube.com
+  - name: "opentunnel tr"
+    type: trojan
+    server: sgt-2.opensvr.net
+    port: 443
+    password: opentunnel.net-diecko
+    udp: true
+    sni: m.youtube.com
+    alpn:
+       - h2
+       - http/1.1
+    skip-cert-verify: true
+  - name: "serverssh"
+    type: vmess
+    server: sg2ray.serverssh.net
+    port: 443
+    uuid: 05df8274-d011-4cff-80f1-111dff274e66
+    alterId: 0
+    cipher: auto
+    tls: true
+    skip-cert-verify: true
+    servername: null
+    network: ws
+    ws-path: /serverssh.net
+    ws-headers:
+      Host: m.youtube.com
+  - name: "opentunnel"
+    type: vmess
+    server: sgv-6.openv2ray.com
+    port: 443
+    uuid: a40d34c6-b77c-4648-9210-3e8d2f4226b5
+    alterId: 16
+    cipher: auto
+    tls: true
+    skip-cert-verify: true
+    servername: null
+    network: ws
+    ws-path: /opentunnel
+    ws-headers:
+      Host: m.youtube.com
+proxy-groups:
+  - name: Manual Server
+    type: select
+    proxies:
+      - "Best Ping ✓"
+      - "ss sshocean"
+      - "Ket YT"
+      - "Jagoanssh"
+      - "sshstores 1"
+      - "opentunnel tr"
+      - "serverssh"
+      - "opentunnel"
+  - name: Best Ping ✓
+    type: url-test
+    proxies:
+      - "ss sshocean"
+      - "Ket YT"
+      - "Jagoanssh"
+      - "sshstores 1"
+      - "opentunnel tr"
+      - "serverssh"
+      - "opentunnel"
+    url: https://www.google.com/
+    interval: 300
+  - name: "LOAD"
+    type: load-balance
+    proxies:
+      - "ss sshocean"
+      - "Ket YT"
+      - "Jagoanssh"
+      - "sshstores 1"
+      - "opentunnel tr"
+      - "serverssh"
+      - "opentunnel"
+    url: 'https://www.google.com/'
+    interval: 300
+rules:
+  - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
+  - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
+  - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,100.64.0.0/10,DIRECT,no-resolve
+  - IP-CIDR6,::1/128,DIRECT,no-resolve
+  - IP-CIDR6,fc00::/7,DIRECT,no-resolve
+  - IP-CIDR6,fe80::/10,DIRECT,no-resolve
+  - IP-CIDR6,fd00::/8,DIRECT,no-resolve
+  - DOMAIN-SUFFIX,ad.com,REJECT
+  - DOMAIN,analytics.google.com,REJECT
+  - DOMAIN,analyticsinsights-pa.googleapis.com,REJECT
+  - DOMAIN,analyticsreporting.googleapis.com,REJECT
+  - DOMAIN-SUFFIX,doubleclick.net,REJECT
+  - DOMAIN-SUFFIX,googleadservices.com,REJECT
+  - DOMAIN-SUFFIX,googleadsserving.cn,REJECT
+  - DOMAIN-SUFFIX,googlesyndication.com,REJECT
+  - DOMAIN-SUFFIX,googletagmanager.com,REJECT
+  - DOMAIN-SUFFIX,googletagservices.com,REJECT
+  - DOMAIN-SUFFIX,google-analytics.com,REJECT
+  - DOMAIN-KEYWORD,adservice,REJECT
+  - DOMAIN-KEYWORD,analytics,REJECT
+  - DOMAIN-KEYWORD,analysis,REJECT
+  - SRC-IP-CIDR,192.168.1.201/32,DIRECT
+  - IP-CIDR,198.18.0.1/16,REJECT,no-resolve
+  - GEOIP,IR,DIRECT
+  - MATCH,, Manual Server , LOAD, dns-failed
+
